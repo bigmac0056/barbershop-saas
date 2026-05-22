@@ -16,13 +16,13 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={disabled ?? loading}
         className={cn(
           'inline-flex items-center justify-center font-medium rounded-xl transition-all duration-200 select-none',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/50',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold/40',
           'disabled:opacity-50 disabled:cursor-not-allowed',
           {
-            'bg-gold text-black hover:bg-gold-hover active:scale-[0.98]': variant === 'primary',
-            'bg-transparent text-[#F5F5F5] hover:bg-surface active:scale-[0.98]': variant === 'ghost',
+            'bg-gold text-white hover:bg-gold-hover active:scale-[0.98] shadow-sm': variant === 'primary',
+            'bg-transparent text-[#1A1816] hover:bg-surface-2 active:scale-[0.98]': variant === 'ghost',
             'bg-danger/10 text-danger hover:bg-danger/20 border border-danger/30': variant === 'danger',
-            'bg-transparent border border-[#333] text-[#F5F5F5] hover:border-gold/50': variant === 'outline',
+            'bg-transparent border border-border text-[#1A1816] hover:border-gold/60 hover:bg-surface': variant === 'outline',
           },
           {
             'px-3 py-2 text-sm min-h-[36px]': size === 'sm',

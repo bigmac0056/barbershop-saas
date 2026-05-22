@@ -1,5 +1,5 @@
 import uuid
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta, timezone, date as date_type
 from typing import List, Optional
 from sqlalchemy.orm import Session
 
@@ -35,20 +35,32 @@ def compute_slots(employee_id: str, date_str: str, service_id: str, db: Session)
     if not schedule or schedule.is_day_off:
         return []
 
-    day_start = datetime(date_obj.year, date_obj.month, date_obj.day, 0, 0, 0, tzinfo=timezone.utc)
-    day_end = datetime(date_obj.year, date_obj.month, date_obj.day, 23, 59, 59, tzinfo=timezone.utc)
+    start_h, start_m = map(int, schedule.start_time.split(":"))
+    end_h, end_m = map(int, schedule.end_time.split(":"))
+    start_minutes = start_h * 60 + start_m
+    end_minutes = end_h * 60 + end_m
+
+    # Handle overnight schedule (e.g. 09:00 to 01:00 next day)
+    if end_minutes <= start_minutes:
+        end_minutes += 24 * 60  # 01:00 → 25*60 = 1500
+
+    # Base datetime for this day (start of day UTC)
+    day_base = datetime(date_obj.year, date_obj.month, date_obj.day, 0, 0, 0, tzinfo=timezone.utc)
+    # Cover overnight: look up appointments up to +26h to catch night slots
+    lookup_start = day_base
+    lookup_end = day_base + timedelta(hours=26)
 
     existing = db.query(Appointment).filter(
         Appointment.employee_id == employee_id,
         Appointment.status != "cancelled",
-        Appointment.starts_at >= day_start,
-        Appointment.starts_at <= day_end,
+        Appointment.starts_at >= lookup_start,
+        Appointment.starts_at < lookup_end,
     ).all()
 
     blocked = db.query(BlockedSlot).filter(
         BlockedSlot.employee_id == employee_id,
-        BlockedSlot.starts_at >= day_start,
-        BlockedSlot.starts_at <= day_end,
+        BlockedSlot.starts_at >= lookup_start,
+        BlockedSlot.starts_at < lookup_end,
     ).all()
 
     busy = [
@@ -56,22 +68,20 @@ def compute_slots(employee_id: str, date_str: str, service_id: str, db: Session)
         for a in existing + blocked
     ]
 
-    start_h, start_m = map(int, schedule.start_time.split(":"))
-    end_h, end_m = map(int, schedule.end_time.split(":"))
-    start_minutes = start_h * 60 + start_m
-    end_minutes = end_h * 60 + end_m
     duration = int(service.duration_min)
-
     slots: List[str] = []
     now = datetime.now(timezone.utc)
     is_today = date_obj == now.date()
 
     m = start_minutes
     while m + duration <= end_minutes:
-        slot_h = m // 60
-        slot_min = m % 60
-        slot_start = datetime(date_obj.year, date_obj.month, date_obj.day, slot_h, slot_min, tzinfo=timezone.utc)
+        # Use timedelta from base to handle overnight hours naturally
+        slot_start = day_base + timedelta(minutes=m)
         slot_end = slot_start + timedelta(minutes=duration)
+
+        # Display time label (wrap around midnight: hour 25 → 01)
+        slot_h = (m // 60) % 24
+        slot_min = m % 60
 
         if not (is_today and slot_start <= now):
             if not any(slot_start < b_end and slot_end > b_start for b_start, b_end in busy):
@@ -90,6 +100,7 @@ def create_appointment(
     client_phone: str,
     notes: Optional[str],
     db: Session,
+    tg_chat_id: Optional[int] = None,
 ) -> Optional[str]:
     """Returns appointment_id on success, None if slot is taken or service missing."""
     service = db.query(Service).filter(Service.id == service_id).first()
@@ -126,6 +137,7 @@ def create_appointment(
         ends_at=ends_at,
         status="pending",
         notes=notes,
+        tg_chat_id=tg_chat_id,
     )
     db.add(appointment)
     db.commit()

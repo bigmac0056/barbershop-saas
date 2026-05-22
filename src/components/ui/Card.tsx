@@ -10,9 +10,9 @@ export function Card({ className, selected, hoverable, children, ...props }: Car
   return (
     <div
       className={cn(
-        'bg-surface rounded-2xl p-4 transition-all duration-200',
-        hoverable && 'cursor-pointer hover:bg-surface-2 active:scale-[0.99]',
-        selected && 'ring-2 ring-gold bg-surface-2',
+        'bg-surface rounded-2xl p-4 border border-border transition-all duration-200',
+        hoverable && 'cursor-pointer hover:border-gold/40 hover:shadow-sm active:scale-[0.99]',
+        selected && 'border-gold ring-2 ring-gold/25 bg-gold/5',
         className,
       )}
       {...props}

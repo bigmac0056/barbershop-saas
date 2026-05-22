@@ -26,15 +26,15 @@ export function ClientsPage() {
 
   return (
     <div className="min-h-svh flex flex-col max-w-2xl mx-auto">
-      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur border-b border-[#1F1F1F] px-4 py-3">
-        <h1 className="font-bold text-[#F5F5F5] mb-3">Клиенты</h1>
+      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur border-b border-border px-4 py-3">
+        <h1 className="font-bold text-[#1A1816] mb-3">Клиенты</h1>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted" />
           <input
             placeholder="Поиск по имени или телефону..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-surface border border-[#333] rounded-xl pl-9 pr-4 py-2.5 text-sm text-[#F5F5F5] placeholder:text-muted focus:outline-none focus:border-gold/60"
+            className="w-full bg-surface border border-border rounded-xl pl-9 pr-4 py-2.5 text-sm text-[#1A1816] placeholder:text-muted focus:outline-none focus:border-gold focus:ring-2 focus:ring-gold/20"
           />
         </div>
       </div>
@@ -47,12 +47,12 @@ export function ClientsPage() {
         ) : (
           <div className="flex flex-col gap-2">
             {filtered.map((client) => (
-              <div key={client.id} className="bg-surface rounded-xl px-4 py-3 flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-surface-2 flex items-center justify-center text-gold font-bold shrink-0">
+              <div key={client.id} className="bg-surface rounded-xl px-4 py-3 flex items-center gap-3 border border-border">
+                <div className="w-10 h-10 rounded-full bg-gold/10 flex items-center justify-center text-gold font-bold shrink-0 text-sm">
                   {client.name.charAt(0).toUpperCase()}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-[#F5F5F5] truncate">{client.name}</p>
+                  <p className="font-medium text-[#1A1816] truncate">{client.name}</p>
                   <p className="text-xs text-muted">
                     с {format(parseISO(client.created_at), 'd MMM yyyy', { locale: ru })}
                   </p>

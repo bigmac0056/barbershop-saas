@@ -35,7 +35,7 @@ export function AdminLayout() {
       </div>
 
       {/* Bottom navigation */}
-      <nav className="fixed bottom-0 inset-x-0 border-t border-zinc-800 bg-zinc-950/95 backdrop-blur-md safe-bottom z-30">
+      <nav className="fixed bottom-0 inset-x-0 border-t border-border bg-background/95 backdrop-blur-md safe-bottom z-30">
         <div className="flex max-w-lg mx-auto">
           {NAV.map(({ to, label, icon: Icon, end }) => (
             <NavLink
@@ -45,7 +45,7 @@ export function AdminLayout() {
               className={({ isActive }) =>
                 cn(
                   'flex-1 flex flex-col items-center gap-1 py-2.5 text-[10px] font-medium transition-colors',
-                  isActive ? 'text-gold' : 'text-zinc-500 hover:text-zinc-300',
+                  isActive ? 'text-gold' : 'text-muted hover:text-[#1A1816]',
                 )
               }
             >

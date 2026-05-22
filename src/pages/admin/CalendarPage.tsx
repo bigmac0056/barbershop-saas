@@ -10,11 +10,15 @@ import { useEmployees } from '@/hooks/useEmployees'
 import { cn } from '@/lib/utils'
 import type { Appointment, Employee } from '@/types'
 
-const HOURS = Array.from({ length: 12 }, (_, i) => i + 9) // 09:00 – 20:00
+// 09:00 – 01:00 (next day) = hours 9..23 + 0
+const HOURS = [9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,0]
 
 function getTop(startsAt: string): number {
   const d = parseISO(startsAt)
-  return ((d.getHours() - 9) * 60 + d.getMinutes()) * (64 / 60)
+  const h = d.getHours()
+  // Convert hour to position: 9=0, 10=1, ..., 23=14, 0=15
+  const index = h >= 9 ? h - 9 : h + 15
+  return (index * 60 + d.getMinutes()) * (64 / 60)
 }
 
 function getHeight(startsAt: string, endsAt: string): number {
@@ -33,19 +37,19 @@ function AppointmentBlock({ apt, onClick }: AppointmentBlockProps) {
   const time = format(parseISO(apt.starts_at), 'HH:mm')
 
   const colorMap: Record<string, string> = {
-    pending:   'bg-yellow-500/20 border-yellow-500/50 text-yellow-300',
-    confirmed: 'bg-blue-500/20   border-blue-500/50   text-blue-300',
-    completed: 'bg-green-500/20  border-green-500/50  text-green-300',
-    cancelled: 'bg-zinc-700/40   border-zinc-600/50   text-zinc-400  opacity-50',
-    no_show:   'bg-zinc-700/40   border-zinc-600/50   text-zinc-400  opacity-50',
+    pending:   'bg-amber-50  border-amber-300  text-amber-800',
+    confirmed: 'bg-blue-50   border-blue-300   text-blue-800',
+    completed: 'bg-green-50  border-green-300  text-green-800',
+    cancelled: 'bg-surface-2 border-border     text-muted     opacity-50',
+    no_show:   'bg-surface-2 border-border     text-muted     opacity-50',
   }
 
   return (
     <div
       className={cn(
         'absolute left-0.5 right-0.5 rounded-lg border px-2 py-1 cursor-pointer',
-        'overflow-hidden transition-opacity hover:opacity-90 active:opacity-70',
-        colorMap[apt.status] ?? 'bg-surface border-zinc-600 text-[#F5F5F5]',
+        'overflow-hidden transition-opacity hover:opacity-80 active:opacity-60',
+        colorMap[apt.status] ?? 'bg-surface border-border text-[#1A1816]',
       )}
       style={{ top, height }}
       onClick={() => onClick(apt)}
@@ -79,36 +83,36 @@ function DayView({ employees, appointments, onClickApt, onAddSlot }: DayViewProp
       <div className="shrink-0 w-12 pt-10">
         {HOURS.map((h) => (
           <div key={h} className="h-16 flex items-start justify-end pr-2">
-            <span className="text-xs text-zinc-500 -mt-2">{h}:00</span>
+            <span className="text-xs text-muted -mt-2">{String(h).padStart(2,'0')}:00</span>
           </div>
         ))}
       </div>
 
       {/* Employee columns */}
       {employees.map((emp) => (
-        <div key={emp.id} className="flex-1 min-w-[140px] border-l border-zinc-800">
+        <div key={emp.id} className="flex-1 min-w-[140px] border-l border-border">
           {/* Header */}
-          <div className="h-10 flex items-center justify-center border-b border-zinc-800 px-2">
-            <span className="text-xs font-semibold text-[#F5F5F5] truncate">{emp.name.split(' ')[0]}</span>
+          <div className="h-10 flex items-center justify-center border-b border-border px-2">
+            <span className="text-xs font-semibold text-[#1A1816] truncate">{emp.name.split(' ')[0]}</span>
           </div>
 
           {/* Grid */}
           <div className="relative" style={{ height: HOURS.length * 64 }}>
             {/* Hour lines */}
-            {HOURS.map((h) => (
+            {HOURS.map((h, i) => (
               <div
                 key={h}
-                className="absolute left-0 right-0 border-t border-zinc-800/50 cursor-pointer hover:bg-gold/5 transition-colors"
-                style={{ top: (h - 9) * 64, height: 64 }}
+                className="absolute left-0 right-0 border-t border-border/50 cursor-pointer hover:bg-gold/5 transition-colors"
+                style={{ top: i * 64, height: 64 }}
                 onClick={() => onAddSlot(emp.id, `${String(h).padStart(2, '0')}:00`)}
               />
             ))}
             {/* Half-hour dashed lines */}
-            {HOURS.map((h) => (
+            {HOURS.map((h, i) => (
               <div
                 key={`${h}-half`}
-                className="absolute left-0 right-0 border-t border-dashed border-zinc-800/30"
-                style={{ top: (h - 9) * 64 + 32 }}
+                className="absolute left-0 right-0 border-t border-dashed border-border/30"
+                style={{ top: i * 64 + 32 }}
               />
             ))}
             {/* Appointments */}
@@ -156,13 +160,13 @@ function WeekView({ weekStart, appointments, onClickDay }: WeekViewProps) {
             onClick={() => onClickDay(iso)}
             className={cn(
               'flex flex-col items-center py-3 rounded-xl transition-all',
-              isToday ? 'bg-gold/10 border border-gold/30' : 'hover:bg-zinc-800',
+              isToday ? 'bg-gold/10 border border-gold/30' : 'hover:bg-surface-2',
             )}
           >
-            <span className="text-xs text-zinc-400 uppercase mb-1">
+            <span className="text-xs text-muted uppercase mb-1">
               {format(day, 'EE', { locale: ru })}
             </span>
-            <span className={cn('text-lg font-bold', isToday ? 'text-gold' : 'text-[#F5F5F5]')}>
+            <span className={cn('text-lg font-bold', isToday ? 'text-gold' : 'text-[#1A1816]')}>
               {format(day, 'd')}
             </span>
             {count > 0 && (
@@ -195,13 +199,13 @@ function AptDetailDrawer({ apt, onClose, onStatusChange }: AptDetailDrawerProps)
 
   return (
     <>
-      <div className="fixed inset-0 bg-black/60 z-40" onClick={onClose} />
-      <div className="fixed bottom-0 left-0 right-0 z-50 bg-zinc-900 rounded-t-2xl p-5 max-w-lg mx-auto">
-        <div className="w-10 h-1 bg-zinc-600 rounded-full mx-auto mb-5" />
+      <div className="fixed inset-0 bg-black/40 z-40" onClick={onClose} />
+      <div className="fixed bottom-0 left-0 right-0 z-50 bg-background rounded-t-2xl p-5 max-w-lg mx-auto border-t border-border">
+        <div className="w-10 h-1 bg-border rounded-full mx-auto mb-5" />
 
         <div className="flex items-start justify-between mb-4">
           <div>
-            <p className="text-lg font-bold text-[#F5F5F5]">{apt.clients?.name}</p>
+            <p className="text-lg font-bold text-[#1A1816]">{apt.clients?.name}</p>
             <a href={`tel:${apt.clients?.phone}`} className="text-sm text-gold">
               {apt.clients?.phone}
             </a>
@@ -209,18 +213,18 @@ function AptDetailDrawer({ apt, onClose, onStatusChange }: AptDetailDrawerProps)
           <StatusBadge status={apt.status} />
         </div>
 
-        <div className="bg-zinc-800 rounded-xl p-4 flex flex-col gap-2 mb-4 text-sm">
+        <div className="bg-surface rounded-xl border border-border p-4 flex flex-col gap-2 mb-4 text-sm">
           <div className="flex justify-between">
-            <span className="text-zinc-400">Услуга</span>
-            <span className="text-[#F5F5F5] font-medium">{apt.services?.name}</span>
+            <span className="text-muted">Услуга</span>
+            <span className="text-[#1A1816] font-medium">{apt.services?.name}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-zinc-400">Мастер</span>
-            <span className="text-[#F5F5F5] font-medium">{apt.employees?.name}</span>
+            <span className="text-muted">Мастер</span>
+            <span className="text-[#1A1816] font-medium">{apt.employees?.name}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-zinc-400">Время</span>
-            <span className="text-[#F5F5F5] font-medium">
+            <span className="text-muted">Время</span>
+            <span className="text-[#1A1816] font-medium">
               {format(parseISO(apt.starts_at), 'HH:mm')} – {format(parseISO(apt.ends_at), 'HH:mm')}
             </span>
           </div>
@@ -231,7 +235,7 @@ function AptDetailDrawer({ apt, onClose, onStatusChange }: AptDetailDrawerProps)
             <button
               key={opt.value}
               onClick={() => { onStatusChange(apt.id, opt.value); onClose() }}
-              className="w-full py-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-[#F5F5F5] text-sm font-medium transition-colors"
+              className="w-full py-3 rounded-xl bg-surface border border-border hover:border-gold/40 text-[#1A1816] text-sm font-medium transition-colors"
             >
               {opt.label}
             </button>
@@ -278,14 +282,14 @@ export function CalendarPage() {
       <div className="shrink-0 px-4 pt-4 pb-3 flex flex-col gap-3">
         <div className="flex items-center justify-between">
           {/* Mode toggle */}
-          <div className="flex bg-zinc-800 rounded-xl p-1 gap-1">
+          <div className="flex bg-surface-2 rounded-xl p-1 gap-1 border border-border">
             {(['day', 'week'] as const).map((m) => (
               <button
                 key={m}
                 onClick={() => setViewMode(m)}
                 className={cn(
                   'px-3 py-1.5 rounded-lg text-xs font-medium transition-all',
-                  viewMode === m ? 'bg-gold text-black' : 'text-zinc-400 hover:text-[#F5F5F5]',
+                  viewMode === m ? 'bg-gold text-white' : 'text-muted hover:text-[#1A1816]',
                 )}
               >
                 {m === 'day' ? 'День' : 'Неделя'}
@@ -295,7 +299,7 @@ export function CalendarPage() {
 
           <button
             onClick={() => onAddAppointment?.()}
-            className="flex items-center gap-1.5 bg-gold text-black px-3 py-2 rounded-xl text-xs font-semibold"
+            className="flex items-center gap-1.5 bg-gold text-white px-3 py-2 rounded-xl text-xs font-semibold"
           >
             <Plus className="w-3.5 h-3.5" />
             Добавить
@@ -304,14 +308,14 @@ export function CalendarPage() {
 
         {/* Nav row */}
         <div className="flex items-center gap-2">
-          <button onClick={handlePrev} className="p-2 rounded-xl hover:bg-zinc-800 transition-colors">
-            <ChevronLeft className="w-4 h-4 text-zinc-400" />
+          <button onClick={handlePrev} className="p-2 rounded-xl hover:bg-surface-2 transition-colors">
+            <ChevronLeft className="w-4 h-4 text-muted" />
           </button>
-          <button onClick={handleToday} className="flex-1 text-center text-sm font-semibold text-[#F5F5F5] capitalize">
+          <button onClick={handleToday} className="flex-1 text-center text-sm font-semibold text-[#1A1816] capitalize">
             {displayLabel}
           </button>
-          <button onClick={handleNext} className="p-2 rounded-xl hover:bg-zinc-800 transition-colors">
-            <ChevronRight className="w-4 h-4 text-zinc-400" />
+          <button onClick={handleNext} className="p-2 rounded-xl hover:bg-surface-2 transition-colors">
+            <ChevronRight className="w-4 h-4 text-muted" />
           </button>
         </div>
       </div>

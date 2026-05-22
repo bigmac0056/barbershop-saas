@@ -27,11 +27,11 @@ export function LoginPage() {
 
   return (
     <div className="min-h-svh flex flex-col items-center justify-center px-4 max-w-sm mx-auto">
-      <div className="w-14 h-14 rounded-2xl bg-gold/10 border border-gold/20 flex items-center justify-center mb-6">
-        <Scissors className="w-7 h-7 text-gold" />
+      <div className="w-16 h-16 rounded-2xl bg-gold flex items-center justify-center mb-6 shadow-lg shadow-gold/25">
+        <Scissors className="w-8 h-8 text-white" />
       </div>
-      <h1 className="text-2xl font-bold text-[#F5F5F5] mb-1">Вход</h1>
-      <p className="text-muted text-sm mb-8">Панель управления барбершопом</p>
+      <h1 className="text-2xl font-bold text-[#1A1816] mb-1">BarberDom</h1>
+      <p className="text-muted text-sm mb-8">Панель управления</p>
 
       <form onSubmit={handleLogin} className="w-full flex flex-col gap-4">
         <Input

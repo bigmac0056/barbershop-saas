@@ -25,18 +25,17 @@ export function DatePicker({ selected, onSelect, daysCount = 14 }: Props) {
             onClick={() => onSelect(iso)}
             className={cn(
               'flex flex-col items-center justify-center shrink-0',
-              'w-14 h-16 rounded-xl transition-all duration-200',
-              'text-center',
+              'w-14 h-16 rounded-xl transition-all duration-200 border',
               isSelected
-                ? 'bg-gold text-black'
-                : 'bg-surface text-[#F5F5F5] hover:bg-surface-2',
+                ? 'bg-gold border-gold text-white shadow-sm'
+                : 'bg-surface border-border text-[#1A1816] hover:border-gold/40',
             )}
           >
-            <span className={cn('text-xs uppercase', isSelected ? 'text-black/70' : 'text-muted')}>
+            <span className={cn('text-xs uppercase', isSelected ? 'text-white/80' : 'text-muted')}>
               {isToday ? 'Сег' : format(day, 'EEE', { locale: ru }).slice(0, 2)}
             </span>
             <span className="text-xl font-bold leading-tight">{format(day, 'd')}</span>
-            <span className={cn('text-xs', isSelected ? 'text-black/60' : 'text-muted')}>
+            <span className={cn('text-xs', isSelected ? 'text-white/70' : 'text-muted')}>
               {format(day, 'MMM', { locale: ru })}
             </span>
           </button>

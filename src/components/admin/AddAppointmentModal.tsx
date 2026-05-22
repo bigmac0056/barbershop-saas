@@ -102,21 +102,21 @@ export function AddAppointmentModal({ open, defaultEmployeeId, defaultDate, defa
 
   return (
     <>
-      <div className="fixed inset-0 bg-black/70 z-40" onClick={onClose} />
-      <div className="fixed inset-x-0 bottom-0 z-50 bg-zinc-900 rounded-t-2xl max-h-[92svh] overflow-y-auto max-w-lg mx-auto">
+      <div className="fixed inset-0 bg-black/50 z-40" onClick={onClose} />
+      <div className="fixed inset-x-0 bottom-0 z-50 bg-background rounded-t-2xl max-h-[92svh] overflow-y-auto max-w-lg mx-auto border-t border-border">
         {/* Handle */}
-        <div className="sticky top-0 bg-zinc-900 pt-3 pb-2 px-5 flex items-center justify-between border-b border-zinc-800">
-          <div className="w-10 h-1 bg-zinc-600 rounded-full mx-auto absolute left-1/2 -translate-x-1/2 top-3" />
-          <h2 className="text-base font-bold text-[#F5F5F5] mt-3">Новая запись</h2>
-          <button onClick={onClose} className="mt-3 p-1.5 rounded-lg hover:bg-zinc-800 transition-colors">
-            <X className="w-4 h-4 text-zinc-400" />
+        <div className="sticky top-0 bg-background pt-3 pb-2 px-5 flex items-center justify-between border-b border-border">
+          <div className="w-10 h-1 bg-border rounded-full mx-auto absolute left-1/2 -translate-x-1/2 top-3" />
+          <h2 className="text-base font-bold text-[#1A1816] mt-3">Новая запись</h2>
+          <button onClick={onClose} className="mt-3 p-1.5 rounded-lg hover:bg-surface-2 transition-colors">
+            <X className="w-4 h-4 text-muted" />
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="p-5 flex flex-col gap-5">
           {/* Service */}
           <div>
-            <label className="block text-sm font-medium text-zinc-300 mb-2">Услуга</label>
+            <label className="block text-sm font-medium text-[#4A4540] mb-2">Услуга</label>
             <div className="flex flex-col gap-2">
               {services.map((s) => (
                 <button
@@ -126,12 +126,12 @@ export function AddAppointmentModal({ open, defaultEmployeeId, defaultDate, defa
                   className={cn(
                     'flex items-center justify-between px-4 py-3 rounded-xl border text-left transition-all',
                     serviceId === s.id
-                      ? 'border-gold/60 bg-gold/10 text-[#F5F5F5]'
-                      : 'border-zinc-700 bg-zinc-800 text-zinc-300 hover:border-zinc-600',
+                      ? 'border-gold bg-gold/10 text-[#1A1816]'
+                      : 'border-border bg-surface text-[#1A1816] hover:border-gold/40',
                   )}
                 >
                   <span className="text-sm font-medium">{s.name}</span>
-                  <span className="text-xs text-zinc-400">{formatDuration(s.duration_min)} · {formatPrice(s.price)}</span>
+                  <span className="text-xs text-muted">{formatDuration(s.duration_min)} · {formatPrice(s.price)}</span>
                 </button>
               ))}
             </div>
@@ -139,7 +139,7 @@ export function AddAppointmentModal({ open, defaultEmployeeId, defaultDate, defa
 
           {/* Employee */}
           <div>
-            <label className="block text-sm font-medium text-zinc-300 mb-2">Мастер</label>
+            <label className="block text-sm font-medium text-[#4A4540] mb-2">Мастер</label>
             <div className="grid grid-cols-2 gap-2">
               {employees.map((emp) => (
                 <button
@@ -149,8 +149,8 @@ export function AddAppointmentModal({ open, defaultEmployeeId, defaultDate, defa
                   className={cn(
                     'px-3 py-3 rounded-xl border text-sm font-medium transition-all',
                     employeeId === emp.id
-                      ? 'border-gold/60 bg-gold/10 text-[#F5F5F5]'
-                      : 'border-zinc-700 bg-zinc-800 text-zinc-300 hover:border-zinc-600',
+                      ? 'border-gold bg-gold/10 text-[#1A1816]'
+                      : 'border-border bg-surface text-[#1A1816] hover:border-gold/40',
                   )}
                 >
                   {emp.name.split(' ')[0]}
@@ -161,7 +161,7 @@ export function AddAppointmentModal({ open, defaultEmployeeId, defaultDate, defa
 
           {/* Date */}
           <div>
-            <label className="block text-sm font-medium text-zinc-300 mb-2">Дата</label>
+            <label className="block text-sm font-medium text-[#4A4540] mb-2">Дата</label>
             <div className="flex gap-2 overflow-x-auto pb-1 -mx-5 px-5 scrollbar-none">
               {days.map((d) => {
                 const isToday = d === format(new Date(), 'yyyy-MM-dd')
@@ -171,11 +171,13 @@ export function AddAppointmentModal({ open, defaultEmployeeId, defaultDate, defa
                     key={d}
                     onClick={() => { setDate(d); setTime('') }}
                     className={cn(
-                      'shrink-0 flex flex-col items-center px-3 py-2 rounded-xl transition-all min-w-[52px]',
-                      date === d ? 'bg-gold text-black' : 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700',
+                      'shrink-0 flex flex-col items-center px-3 py-2 rounded-xl border transition-all min-w-[52px]',
+                      date === d
+                        ? 'bg-gold border-gold text-white'
+                        : 'bg-surface border-border text-[#1A1816] hover:border-gold/40',
                     )}
                   >
-                    <span className={cn('text-xs', date === d ? 'text-black/60' : 'text-zinc-500')}>
+                    <span className={cn('text-xs', date === d ? 'text-white/70' : 'text-muted')}>
                       {isToday ? 'Сег' : format(new Date(d), 'EE', { locale: { code: 'ru' } as never }).slice(0, 2)}
                     </span>
                     <span className="text-base font-bold">{format(new Date(d + 'T12:00:00'), 'd')}</span>
@@ -188,11 +190,11 @@ export function AddAppointmentModal({ open, defaultEmployeeId, defaultDate, defa
           {/* Time slots */}
           {serviceId && employeeId && (
             <div>
-              <label className="block text-sm font-medium text-zinc-300 mb-2">Время</label>
+              <label className="block text-sm font-medium text-[#4A4540] mb-2">Время</label>
               {slotsLoading ? (
-                <p className="text-xs text-zinc-500">Загрузка слотов...</p>
+                <p className="text-xs text-muted">Загрузка слотов...</p>
               ) : slots.length === 0 ? (
-                <p className="text-xs text-zinc-500">Нет свободных слотов на эту дату</p>
+                <p className="text-xs text-muted">Нет свободных слотов на эту дату</p>
               ) : (
                 <div className="grid grid-cols-5 gap-2">
                   {slots.map((slot) => (
@@ -201,8 +203,10 @@ export function AddAppointmentModal({ open, defaultEmployeeId, defaultDate, defa
                       key={slot}
                       onClick={() => setTime(slot)}
                       className={cn(
-                        'py-2.5 rounded-xl text-sm font-medium transition-all',
-                        time === slot ? 'bg-gold text-black' : 'bg-zinc-800 text-zinc-300 hover:bg-zinc-700',
+                        'py-2.5 rounded-xl border text-sm font-medium transition-all',
+                        time === slot
+                          ? 'bg-gold border-gold text-white'
+                          : 'bg-surface border-border text-[#1A1816] hover:border-gold/40',
                       )}
                     >
                       {slot}
@@ -238,7 +242,7 @@ export function AddAppointmentModal({ open, defaultEmployeeId, defaultDate, defa
             />
           </div>
 
-          {error && <p className="text-sm text-red-400">{error}</p>}
+          {error && <p className="text-sm text-danger">{error}</p>}
 
           <Button type="submit" size="lg" fullWidth loading={loading} className="mb-2">
             Создать запись

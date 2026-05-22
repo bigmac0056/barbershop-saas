@@ -32,11 +32,11 @@ export function TimeSlots({ slots, selected, loading, onSelect }: Props) {
           key={slot}
           onClick={() => onSelect(slot)}
           className={cn(
-            'py-3 rounded-xl text-sm font-medium transition-all duration-200',
+            'py-3 rounded-xl text-sm font-medium transition-all duration-200 border',
             'min-h-[48px]',
             selected === slot
-              ? 'bg-gold text-black'
-              : 'bg-surface text-[#F5F5F5] hover:bg-surface-2',
+              ? 'bg-gold border-gold text-white shadow-sm'
+              : 'bg-surface border-border text-[#1A1816] hover:border-gold/40',
           )}
         >
           {slot}

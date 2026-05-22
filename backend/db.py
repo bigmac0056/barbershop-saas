@@ -83,6 +83,7 @@ class Appointment(Base):
     ends_at = Column(DateTime(timezone=True), nullable=False)
     status = Column(String(20), default="pending")
     notes = Column(Text, nullable=True)
+    tg_chat_id = Column(BigInteger, nullable=True)  # Telegram chat_id if booked via bot
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     client = relationship("Client")
@@ -99,6 +100,17 @@ class TelegramSession(Base):
 
 def init_db():
     Base.metadata.create_all(bind=engine)
+    # Add tg_chat_id column to existing appointments table if missing
+    try:
+        from sqlalchemy import text
+        with engine.connect() as conn:
+            if DATABASE_URL.startswith("sqlite"):
+                conn.execute(text("ALTER TABLE appointments ADD COLUMN tg_chat_id INTEGER"))
+            else:
+                conn.execute(text("ALTER TABLE appointments ADD COLUMN tg_chat_id BIGINT"))
+            conn.commit()
+    except Exception:
+        pass  # Column already exists
 
 
 def get_db():

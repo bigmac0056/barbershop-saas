@@ -25,7 +25,7 @@ export function EmployeeSelect({ serviceId, selected, onSelect }: Props) {
           onClick={() => onSelect(emp)}
           className="flex items-center gap-4"
         >
-          <div className="w-14 h-14 rounded-full bg-surface-2 overflow-hidden shrink-0 flex items-center justify-center">
+          <div className="w-14 h-14 rounded-full bg-surface-2 border border-border overflow-hidden shrink-0 flex items-center justify-center">
             {emp.photo_url ? (
               <img src={emp.photo_url} alt={emp.name} className="w-full h-full object-cover" />
             ) : (
@@ -33,8 +33,8 @@ export function EmployeeSelect({ serviceId, selected, onSelect }: Props) {
             )}
           </div>
           <div className="flex-1 text-left">
-            <p className="font-semibold text-[#F5F5F5]">{emp.name}</p>
-            {emp.bio && <p className="text-sm text-muted mt-0.5 line-clamp-1">{emp.bio}</p>}
+            <p className="font-semibold text-[#1A1816]">{emp.name}</p>
+            {emp.bio && <p className="text-sm text-muted mt-0.5 line-clamp-2">{emp.bio}</p>}
           </div>
         </Card>
       ))}
